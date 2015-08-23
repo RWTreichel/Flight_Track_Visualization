@@ -6,16 +6,19 @@ Created on Wed Aug 19 12:50:15 2015
 @author: Justin
 """
 
-import re
-import csv
+filename = 'C:/Users/Justin/Documents/GitHub/Flight_Track_Visualization/Example_Tracks/LT6_Single_Flight_Track.txt'
+#filename = 'C:/Users/Justin/Documents/GitHub/Flight_Track_Visualization/Example_Tracks/LT6_Multiple_Flight_Tracks.txt'
+
+#%% Modules
+###############################################################################
 from datetime import datetime as dt
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import re
+import csv
+import json    
 
-#filename = 'C:/Users/Justin/Documents/GitHub/Flight_Track_Visualization/LT6_Single_Flight_Track.txt'
-#filename = 'C:/Users/Justin/Documents/GitHub/Flight_Track_Visualization/LT6_Multiple_Flight_Tracks.txt'
-
-# Define Track Object
+#%% Define Track Object
 ###############################################################################
 class Track:
     def __init__(self, trk_data, trk_geo):
@@ -55,7 +58,7 @@ class Track:
         ax.set_aspect('equal')
         plt.show()
 
-# Parsing functions
+#%% Parsing functions
 ###############################################################################
 def get_trk_data(data):
     trk_data = []
@@ -89,7 +92,7 @@ def get_trk_count(data):
     return(trk_count)
 
 
-# Run Area
+#%% Create tracks dictionary
 ###############################################################################
 
 def get_tracks(filename):
@@ -117,13 +120,28 @@ def get_tracks(filename):
         tracks[id] = Track(get_trk_data(t), get_trk_geo(t))
         id += 1
     return(tracks)
+    
+#%% Export
+###############################################################################
 
 def get_csv(tracks):
-    with open('Track_for_DS3.csv', 'w', newline='') as csvfile:
-    spamwriter = csv.writer(csvfile, delimiter=' ',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    spamwriter.writerow(['TIME','X_COORD', 'Y_COORD','Z_COORD'])
-    for track in tracks[0]:
-        spamwriter.writerow([)
+    with open('C:/Users/Justin/Documents/GitHub/Flight_Track_Visualization/Example_Tracks/csv_ouput.csv', 'w', newline='') as csvfile:
+        spamwriter = csv.writer(csvfile, delimiter=',') #, quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        spamwriter.writerow(['TIME','X_COORD', 'Y_COORD','Z_COORD'])
+        for i in range(len(tracks[0].x)):
+            spamwriter.writerow([tracks[0].t[i], tracks[0].x[i], tracks[0].y[i], tracks[0].z[i]])
+        
+def get_json(tracks):    
+    with open('C:/Users/Justin/Documents/GitHub/Flight_Track_Visualization/Example_Tracks/json_ouput.json', 'w') as outfile:
+        #ls = ['TIME','X_COORD', 'Y_COORD','Z_COORD']
+        ls = (list(zip(tracks[0].t, tracks[0].x, tracks[0].y, tracks[0].z)))
+        ls.insert(0, ['TIME','X_COORD', 'Y_COORD','Z_COORD'])
+        json.dump(ls, outfile, ensure_ascii=False)
     
     
+    
+# %% Test run area
+    
+tracks = get_tracks(filename)
+get_csv(tracks)
+get_json(tracks)
